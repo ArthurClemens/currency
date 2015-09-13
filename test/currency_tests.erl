@@ -35,7 +35,7 @@ parse_CHF_test() -> ?assert(currency:parse(<<"CHF 108.75">>) =:= [{currency, <<"
 parse_ALL_test() -> ?assert(currency:parse(<<"Lek 108.75">>) =:= [{currency, <<"ALL">>},{whole, 108},{cents, 75}]).
 parse_TRY_test() -> ?assert(currency:parse(<<"TRY 108.75">>) =:= [{currency, <<"TRY">>},{whole, 108},{cents, 75}]).
 parse_TRL_test() -> ?assert(currency:parse(<<"TRL 108.75">>) =:= [{currency, <<"TRL">>},{whole, 108},{cents, 75}]).
-parse_TRL2_test() -> ?assert(currency:parse(<<"₤ 108.75">>) =:= [{currency, <<"TRL">>},{whole, 108},{cents, 75}]).
+parse_TRL2_test() -> ?assert(currency:parse(<<"₤ 108.75"/utf8>>) =:= [{currency, <<"TRL">>},{whole, 108},{cents, 75}]).
 parse_DKK_test() -> ?assert(currency:parse(<<"DKK 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{cents, 75}]).
 parse_DKK2_test() -> ?assert(currency:parse(<<"kr 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{cents, 75}]).
 
