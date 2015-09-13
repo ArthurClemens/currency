@@ -1,7 +1,10 @@
 currency
 ========
 
-Erlang utility. Reads various currency notations and returns this as a data proplist.
+Erlang utility. Reads currency text (in various notations) and returns this as a data proplist.
+
+Currency symbols are returned as [ISO 4217 Currency Codes](http://www.xe.com/iso4217.php).
+Coverage of currency codes is incomplete.
 
 
 Examples
@@ -14,6 +17,7 @@ Examples
 | `currency:parse(<<"11,- €"/utf8>>)`  | `[{currency,<<"EUR">>},{whole,11},{cents,0}]`  |
 
 See the test file for full coverage.
+
 
 Build
 -----

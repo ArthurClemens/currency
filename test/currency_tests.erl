@@ -22,14 +22,23 @@ parse10_test() -> ?assert(currency:parse(<<"USD 1,222.99">>) =:= [{currency, <<"
 parse11_test() -> ?assert(currency:parse(<<"USD 1,222">>) =:= [{currency, <<"USD">>},{whole, 1222},{cents, 0}]).
 parse12_test() -> ?assert(currency:parse(<<"$ 1,222.00">>) =:= [{currency, <<"USD">>},{whole, 1222},{cents, 0}]).
 parse13_test() -> ?assert(currency:parse(<<"£ 111.99"/utf8>>) =:= [{currency, <<"GBP">>},{whole, 111},{cents, 99}]).
-parse14_test() -> ?assert(currency:parse(<<"111.99 £">>) =:= [{currency, <<"GBP">>},{whole, 111},{cents, 99}]).
+parse14_test() -> ?assert(currency:parse(<<"111.99 £"/utf8>>) =:= [{currency, <<"GBP">>},{whole, 111},{cents, 99}]).
 parse15_test() -> ?assert(currency:parse(<<"€ 11,99"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 99}]).
 parse16_test() -> ?assert(currency:parse(<<"€ 11"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 0}]).
 parse17_test() -> ?assert(currency:parse(<<"€ 11,-"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 0}]).
 parse18_test() -> ?assert(currency:parse(<<"€ 11,--"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 0}]).
 parse19_test() -> ?assert(currency:parse(<<"11 €"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 0}]).
 parse20_test() -> ?assert(currency:parse(<<"11,- €"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{cents, 0}]).
-parse21_test() -> ?assert(currency:parse(<<"EUR 108.75">>) =:= [{currency, <<"EUR">>},{whole, 108},{cents, 75}]).
+
+parse_EUR_test() -> ?assert(currency:parse(<<"EUR 108.75">>) =:= [{currency, <<"EUR">>},{whole, 108},{cents, 75}]).
+parse_CHF_test() -> ?assert(currency:parse(<<"CHF 108.75">>) =:= [{currency, <<"CHF">>},{whole, 108},{cents, 75}]).
+parse_ALL_test() -> ?assert(currency:parse(<<"Lek 108.75">>) =:= [{currency, <<"ALL">>},{whole, 108},{cents, 75}]).
+parse_TRY_test() -> ?assert(currency:parse(<<"TRY 108.75">>) =:= [{currency, <<"TRY">>},{whole, 108},{cents, 75}]).
+parse_TRL_test() -> ?assert(currency:parse(<<"TRL 108.75">>) =:= [{currency, <<"TRL">>},{whole, 108},{cents, 75}]).
+parse_TRL2_test() -> ?assert(currency:parse(<<"₤ 108.75">>) =:= [{currency, <<"TRL">>},{whole, 108},{cents, 75}]).
+parse_DKK_test() -> ?assert(currency:parse(<<"DKK 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{cents, 75}]).
+parse_DKK2_test() -> ?assert(currency:parse(<<"kr 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{cents, 75}]).
+
 
 %%====================================================================
 %% Internal functions tests

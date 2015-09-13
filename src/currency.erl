@@ -1,5 +1,3 @@
-%% -*- coding: utf-8 -*-
-
 -module('currency').
 
 %% API exports
@@ -12,12 +10,6 @@
 	amounts/1
 ]).
 
--define(EUR, <<"€"/utf8>>).
--define(EUR1, <<130,172>>).
--define(GBP, <<"£">>).
--define(USD, <<"$">>).
-
-
 %%====================================================================
 %% API functions
 %%====================================================================
@@ -25,10 +17,7 @@
 -spec parse(Text) -> [{'currency',binary()} | {'whole','undefined' | integer()} | {'cents','undefined' | integer()}] when
     Text :: binary().
 parse(Text) ->
-    Currency = case currency_from_symbols(symbols(Text)) of
-    	undefined -> currency_from_words(words(Text));
-    	C -> C
-    end,
+    Currency = currency_symbol:symbol(Text),
     [Whole, Cents] = case amounts(Text) of
     	undefined -> [undefined, undefined];
     	[W, Ct] -> [W, Ct];
@@ -45,50 +34,6 @@ parse(Text) ->
 %%====================================================================
 %% Internal functions
 %%====================================================================
-
--spec words(Text) -> list(binary()) when
-    Text :: binary().
-words(Text) -> 
-    Tokens = re:split(Text, <<"\\W|\\d|\\s|\\.\\,">>, [{return, binary}]),
-    lists:filter(fun(T) ->
-        T =/= <<>>
-    end, Tokens).
-
-
--spec symbols(Text) -> list(binary()) when
-    Text :: binary().
-symbols(Text) -> 
-    Tokens = re:split(Text, <<"\\w|\\(|\\)|\\d|\\s|\\.|\\,">>, [{return, binary}]),
-    lists:filter(fun(T) ->
-        T =/= <<>>
-    end, Tokens).
-
-
--spec currency_from_words(Words) -> binary() when
-    Words :: list(binary()).
-currency_from_words(Words) ->
-    lists:foldl(fun(Word, Acc) ->
-        case Word of
-            <<"USD">> -> <<"USD">>;
-            <<"EUR">> -> <<"EUR">>;
-            <<"GBP">> -> <<"GBP">>;
-            _ -> Acc
-        end
-    end, undefined, Words).
-
-
--spec currency_from_symbols(Symbols) -> binary() | undefined when
-    Symbols :: list(binary()).
-currency_from_symbols(Symbols) ->
-    lists:foldl(fun(Symbol, Acc) ->
-        case Symbol of
-        	?GBP -> <<"GBP">>;
-            ?USD -> <<"USD">>;
-            ?EUR -> <<"EUR">>;
-            ?EUR1 -> <<"EUR">>;
-            _ -> Acc
-        end
-    end, undefined, Symbols).
 
 
 % The amount text is first trimmed to remove non-numeric info.
@@ -126,10 +71,8 @@ currency_from_symbols(Symbols) ->
 -spec amounts(Text) -> list(integer()) | undefined when
     Text :: binary().
 amounts(Text) -> 
-	{ok, TrimPattern} = re:compile(<<"^[^\\d]+|[^\\d]+$">>),
-	{ok, AmountPattern} = re:compile("(?<WHOLE>\\d+|(\\d{1,3}[,\\.]\\d*)+)([,\\.](?<CENTS>\\d{1,2}))?$"),
-	Trimmed = re:replace(Text, TrimPattern, <<"">>, [global, {return, binary}]),
-	case re:run(Trimmed, AmountPattern, [global, {capture, all_names, binary}]) of
+	Trimmed = re:replace(Text, <<"^[^\\d]+|[^\\d]+$">>, <<"">>, [global, {return, binary}]),
+	case re:run(Trimmed, <<"(?<WHOLE>\\d+|(\\d{1,3}[,\\.]\\d*)+)([,\\.](?<CENTS>\\d{1,2}))?$">>, [global, {capture, all_names, binary}]) of
 		{match, [[Cents, Whole]]} ->
 			[bin_to_integer(Whole), bin_to_integer(Cents, 2)];
 		_ -> undefined
@@ -156,5 +99,3 @@ bin_to_integer(Bin, Pad) ->
 	            error:_ -> undefined
 	        end
 	end.
-
-
