@@ -1,5 +1,4 @@
-currency
-========
+# currency
 
 Erlang utility. Reads currency text (in various notations) and returns this as a data proplist.
 
@@ -7,8 +6,7 @@ Currency symbols are returned as [ISO 4217 Currency Codes](http://www.xe.com/iso
 Coverage of currency codes is incomplete.
 
 
-Examples
---------
+## Examples
 
 | Command  | Result |
 | ------------- | ------------- |
@@ -19,7 +17,11 @@ Examples
 See the test file for full coverage.
 
 
-Build
------
+## Requirements
+
+* Erlang 17 or higher
+
+
+## Build
 
     $ rebar3 compile
