@@ -1,5 +1,5 @@
-{application, 'currency',
- [{description, "Reads currency text (in various notations) and returns this as a data proplist."},
+{application, 'parse_price',
+ [{description, "Reads price text (in various notations) and returns this as a data proplist."},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,

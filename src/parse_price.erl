@@ -1,4 +1,4 @@
--module('currency').
+-module('parse_price').
 
 %% API exports
 -export([
@@ -7,26 +7,31 @@
 
 %% Test exports
 -export([
-	amounts/1
+	amounts/1,
+	amount_to_binary/2
 ]).
 
 %%====================================================================
 %% API functions
 %%====================================================================
 
--spec parse(Text) -> [{'currency',binary()} | {'whole','undefined' | integer()} | {'cents','undefined' | integer()}] when
+-spec parse(Text) -> [{'currency',binary()} | {'whole','undefined' | integer()} | {'fraction','undefined' | integer()} | {'text',binary()}] when
     Text :: binary().
 parse(Text) ->
     Currency = currency_symbol:symbol(Text),
-    [Whole, Cents] = case amounts(Text) of
+    [Whole, Fraction] = case amounts(Text) of
     	undefined -> [undefined, undefined];
-    	[W, Ct] -> [W, Ct];
+    	[W, F] -> [W, F];
     	_ -> [undefined, undefined]
     end,
+    PriceTextWhole = amount_to_binary(Whole, 0),
+    PriceTextFraction = amount_to_binary(Fraction, 2),
+    PriceText = list_to_binary(io_lib:format("~s.~s", [PriceTextWhole, PriceTextFraction])),
     [
     	{currency, Currency},
     	{whole, Whole},
-    	{cents, Cents}
+    	{fraction, Fraction},
+    	{text, PriceText}
     ].
 
 
@@ -73,8 +78,8 @@ parse(Text) ->
 amounts(Text) -> 
 	Trimmed = re:replace(Text, <<"^[^\\d]+|[^\\d]+$">>, <<"">>, [global, {return, binary}]),
 	case re:run(Trimmed, <<"(?<WHOLE>\\d+|(\\d{1,3}[,\\.]\\d*)+)([,\\.](?<CENTS>\\d{1,2}))?$">>, [global, {capture, all_names, binary}]) of
-		{match, [[Cents, Whole]]} ->
-			[bin_to_integer(Whole), bin_to_integer(Cents, 2)];
+		{match, [[Fraction, Whole]]} ->
+			[bin_to_integer(Whole), bin_to_integer(Fraction, 2)];
 		_ -> undefined
 	end.
 
@@ -85,17 +90,26 @@ bin_to_integer(Bin) ->
     Bin :: binary(),
     Pad :: integer().
 bin_to_integer(Bin, Pad) ->
-	Bin1 = re:replace(Bin, <<"[^\\d]">>, <<"">>, [global, {return, binary}]),
-	Str = case Pad of
-		0 -> binary_to_list(Bin1);
-		P -> string:left(binary_to_list(Bin1),P,$0)
-	end,
-	case Str of
-		"" -> 0;
-		_ -> 
-			try list_to_integer(Str) of
-	            N -> N
-	        catch
-	            error:_ -> undefined
+	N = re:replace(Bin, <<"[^\\d]">>, <<"">>, [global, {return, binary}]),
+	case N of
+	    <<>> -> 0;
+	    _ ->    
+	        % make sure that 1.9 is read as 90 cents instead of 9
+	        case Pad of
+                0 -> binary_to_integer(N);
+        		P ->
+        		    Padded = string:left(binary_to_list(N),P,$0),
+        		    list_to_integer(Padded)
 	        end
 	end.
+
+-spec amount_to_binary(N, Pad) -> binary() when
+    N :: integer(),
+    Pad :: integer().
+amount_to_binary(N, Pad) ->
+    case Pad of
+        0 -> integer_to_binary(N);
+        P ->
+            Padded = string:right(integer_to_list(N),P,$0),
+            list_to_binary(Padded)
+    end.
