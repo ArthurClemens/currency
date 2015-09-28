@@ -15,9 +15,11 @@
 %% API functions
 %%====================================================================
 
--spec parse(Text) -> [{'currency',binary()} | {'whole','undefined' | integer()} | {'fraction','undefined' | integer()} | {'text',binary()}] when
+-spec parse(Text) -> [{'currency',binary() | 'undefined'} | {'whole', integer() | 'undefined'} | {'fraction', integer() | 'undefined'} | {'text', binary() | 'undefined'}] when
     Text :: binary().
-parse(Text) ->
+parse(Text) when Text =:= <<>> ->
+    empty_result();
+parse(Text) when is_binary(Text) ->
     Currency = currency_symbol:symbol(Text),
     [Whole, Fraction] = case amounts(Text) of
     	undefined -> [undefined, undefined];
@@ -26,14 +28,15 @@ parse(Text) ->
     end,
     PriceTextWhole = amount_to_binary(Whole, 0),
     PriceTextFraction = amount_to_binary(Fraction, 2),
-    PriceText = list_to_binary(io_lib:format("~s.~s", [PriceTextWhole, PriceTextFraction])),
+    PriceText = to_text(PriceTextWhole, PriceTextFraction),
     [
     	{currency, Currency},
     	{whole, Whole},
     	{fraction, Fraction},
     	{text, PriceText}
-    ].
-
+    ];
+parse(_Text) ->
+    empty_result().
 
     
 %%====================================================================
@@ -103,9 +106,11 @@ bin_to_integer(Bin, Pad) ->
 	        end
 	end.
 
--spec amount_to_binary(N, Pad) -> binary() when
+-spec amount_to_binary(N, Pad) -> binary() | 'undefined' when
     N :: integer(),
     Pad :: integer().
+amount_to_binary(N, _Pad) when N =:= undefined ->
+    undefined;
 amount_to_binary(N, Pad) ->
     case Pad of
         0 -> integer_to_binary(N);
@@ -113,3 +118,19 @@ amount_to_binary(N, Pad) ->
             Padded = string:right(integer_to_list(N),P,$0),
             list_to_binary(Padded)
     end.
+
+-spec to_text(Whole, Fraction) -> 'undefined' | binary() when
+    Whole :: 'undefined' | integer(),
+    Fraction :: 'undefined' | integer().
+to_text(Whole, Fraction) when Whole =:= undefined; Fraction =:= undefined ->
+    undefined;
+to_text(Whole, Fraction) ->
+    list_to_binary(io_lib:format("~s.~s", [Whole, Fraction])).
+
+empty_result() ->
+    [
+    	{currency, undefined},
+    	{whole, undefined},
+    	{fraction, undefined},
+    	{text, undefined}
+    ].

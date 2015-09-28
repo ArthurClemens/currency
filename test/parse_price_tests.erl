@@ -8,7 +8,6 @@
 %% API functions tests
 %%====================================================================
 
-
 parse1_test() -> ?assert(parse_price:parse(<<"1">>) =:= [{currency, undefined},{whole, 1},{fraction, 0},{text, <<"1.00">>}]).
 parse2_test() -> ?assert(parse_price:parse(<<"$1">>) =:= [{currency, <<"USD">>},{whole, 1},{fraction, 0},{text, <<"1.00">>}]).
 parse3_test() -> ?assert(parse_price:parse(<<"$0.99">>) =:= [{currency, <<"USD">>},{whole, 0},{fraction, 99},{text, <<"0.99">>}]).
@@ -39,6 +38,9 @@ parse_TRL2_test() -> ?assert(parse_price:parse(<<"₤ 108.75"/utf8>>) =:= [{curr
 parse_DKK_test() -> ?assert(parse_price:parse(<<"DKK 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{fraction, 75},{text, <<"108.75">>}]).
 parse_DKK2_test() -> ?assert(parse_price:parse(<<"kr 108.75">>) =:= [{currency, <<"DKK">>},{whole, 108},{fraction, 75},{text, <<"108.75">>}]).
 
+parse_invalid_input1_test() -> ?assert(parse_price:parse(<<>>) =:= [{currency, undefined},{whole, undefined},{fraction, undefined},{text, undefined}]).
+parse_invalid_input2_test() -> ?assert(parse_price:parse([]) =:= [{currency, undefined},{whole, undefined},{fraction, undefined},{text, undefined}]).
+parse_invalid_input3_test() -> ?assert(parse_price:parse(<<1>>) =:= [{currency, undefined},{whole, undefined},{fraction, undefined},{text, undefined}]).
 
 %%====================================================================
 %% Internal functions tests

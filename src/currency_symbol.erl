@@ -7,10 +7,10 @@
 	symbol/1
 ]).
 
--spec symbol(Text) -> binary() when
+-spec symbol(Text) -> binary() | 'undefined' when
     Text :: binary().
 symbol(Text) ->
-	Words = words(Text),
+    Words = words(Text),
     case match_symbol(Words) of
     	undefined -> 
     		Symbols = symbols(Text),
@@ -22,7 +22,6 @@ symbol(Text) ->
     Symbols :: list().
 match_symbol(Symbols) ->
 	lists:foldl(fun(Symbol, Acc) ->
-		%io:format("Symbol=~p~n", [Symbol]),
         case code(Symbol) of
         	undefined -> Acc;
         	Code -> Code
@@ -30,7 +29,7 @@ match_symbol(Symbols) ->
     end, undefined, Symbols).
 
 
--spec words(Text) -> list(binary()) when
+-spec words(Text) -> list(binary()) | 'undefined' when
     Text :: binary().
 words(Text) -> 
     tokens(Text, <<"\\W|\\d|\\s|\\.\\,">>).
