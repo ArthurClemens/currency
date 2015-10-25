@@ -28,6 +28,7 @@ parse17_test() -> ?assert(parse_price:parse(<<"€ 11,-"/utf8>>) =:= [{currency,
 parse18_test() -> ?assert(parse_price:parse(<<"€ 11,--"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{fraction, 0},{text, <<"11.00">>}]).
 parse19_test() -> ?assert(parse_price:parse(<<"11 €"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{fraction, 0},{text, <<"11.00">>}]).
 parse20_test() -> ?assert(parse_price:parse(<<"11,- €"/utf8>>) =:= [{currency, <<"EUR">>},{whole, 11},{fraction, 0},{text, <<"11.00">>}]).
+parse21_test() -> ?assert(parse_price:parse(<<"9 , 17"/utf8>>) =:= [{currency, undefined},{whole, 9},{fraction, 17},{text, <<"9.17">>}]).
 
 parse_EUR_test() -> ?assert(parse_price:parse(<<"EUR 108.75">>) =:= [{currency, <<"EUR">>},{whole, 108},{fraction, 75},{text, <<"108.75">>}]).
 parse_CHF_test() -> ?assert(parse_price:parse(<<"CHF 108.75">>) =:= [{currency, <<"CHF">>},{whole, 108},{fraction, 75},{text, <<"108.75">>}]).

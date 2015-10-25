@@ -38,7 +38,7 @@ parse(Text) when is_binary(Text) ->
 parse(_Text) ->
     empty_result().
 
-    
+
 %%====================================================================
 %% Internal functions
 %%====================================================================
@@ -49,7 +49,7 @@ parse(_Text) ->
 %
 % Amount regex:
 % (?<WHOLE>\d+|(\d{1,3}[,\.]\d*)+)([,\.](?<CENTS>\d{1,2}))?$
-% 
+%
 % Test strings:
 %
 % 1
@@ -73,14 +73,14 @@ parse(_Text) ->
 % 1,222
 % 1,222.99
 % 111.99
-% 
+%
 % Test page: http://www.rubular.com/r/yqdz7mAL6l
 
 -spec amounts(Text) -> list(integer()) | undefined when
     Text :: binary().
-amounts(Text) -> 
+amounts(Text) ->
 	Trimmed = re:replace(Text, <<"^[^\\d]+|[^\\d]+$">>, <<"">>, [global, {return, binary}]),
-	case re:run(Trimmed, <<"(?<WHOLE>\\d+|(\\d{1,3}[,\\.]\\d*)+)([,\\.](?<CENTS>\\d{1,2}))?$">>, [global, {capture, all_names, binary}]) of
+	case re:run(Trimmed, <<"(?<WHOLE>\\d+|(\\d{1,3}[,\\.]\\d*)+)\\s*([,\\.]\\s*(?<CENTS>\\d{1,2}))?$">>, [global, {capture, all_names, binary}]) of
 		{match, [[Fraction, Whole]]} ->
 			[bin_to_integer(Whole), bin_to_integer(Fraction, 2)];
 		_ -> undefined
@@ -96,7 +96,7 @@ bin_to_integer(Bin, Pad) ->
 	N = re:replace(Bin, <<"[^\\d]">>, <<"">>, [global, {return, binary}]),
 	case N of
 	    <<>> -> 0;
-	    _ ->    
+	    _ ->
 	        % make sure that 1.9 is read as 90 cents instead of 9
 	        case Pad of
                 0 -> binary_to_integer(N);
